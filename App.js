@@ -1,18 +1,68 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useStore } from "./store/store";
+import Animated, { useSharedValue, withTiming } from "react-native-reanimated";
+import { useEffect } from "react";
+import { usePrevious } from "@uidotdev/usehooks";
 
 export default function App() {
   const { count, increment, decrement } = useStore();
+  const previousCount = usePrevious(count)
+
+  const opacity = useSharedValue(1);
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    if(previousCount < count){
+      translateY.value = -50
+      opacity.value = withTiming(1, { duration: 300 });
+      translateY.value = withTiming(0, { duration: 300 });
+    }
+    if(previousCount > count){
+      translateY.value = 50
+      opacity.value = withTiming(1, { duration: 300 });
+      translateY.value = withTiming(0, { duration: 300 });
+    }
+  }, [count]);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{count}</Text>
+      <Animated.Text
+        style={[
+          styles.text,
+          { opacity: opacity, transform: [{ translateY: translateY }] },
+        ]}
+      >
+        {count}
+      </Animated.Text>
       <View style={styles.row}>
-        <TouchableOpacity onPress={decrement} style={[styles.modifier]}>
-          <Text style={{ fontWeight: 600, fontSize: 40, color: "white" }}>-</Text>
+        <TouchableOpacity
+          onPress={() => {
+            opacity.value = withTiming(0, { duration: 300 });
+            translateY.value = withTiming(-50, { duration: 300 });
+            setTimeout(() => {
+              decrement();
+            }, 300);
+          }}
+          style={[styles.modifier]}
+        >
+          <Text style={{ fontWeight: 600, fontSize: 40, color: "white" }}>
+            -
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={increment} style={[styles.modifier, {backgroundColor: "red"}]}>
-          <Text style={{ fontWeight: 600, fontSize: 40, color: "white" }}>+</Text>
+        <TouchableOpacity
+          onPress={() => {
+            opacity.value = withTiming(0, { duration: 300 });
+            translateY.value = withTiming(50, { duration: 300 });
+            setTimeout(() => {
+              increment();
+            }, 300);
+          }}
+          style={[styles.modifier, { backgroundColor: "red" }]}
+        >
+          <Text style={{ fontWeight: 600, fontSize: 40, color: "white" }}>
+            +
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
