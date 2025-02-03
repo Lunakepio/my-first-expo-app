@@ -4,6 +4,7 @@ import { useStore } from "./store/store";
 import Animated, { useSharedValue, withTiming } from "react-native-reanimated";
 import { useEffect } from "react";
 import { usePrevious } from "@uidotdev/usehooks";
+import * as Haptics from "expo-haptics"
 
 export default function App() {
   const { count, increment, decrement } = useStore();
@@ -38,6 +39,7 @@ export default function App() {
       <View style={styles.row}>
         <TouchableOpacity
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
             opacity.value = withTiming(0, { duration: 300 });
             translateY.value = withTiming(-50, { duration: 300 });
             setTimeout(() => {
@@ -52,6 +54,7 @@ export default function App() {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
             opacity.value = withTiming(0, { duration: 300 });
             translateY.value = withTiming(50, { duration: 300 });
             setTimeout(() => {
